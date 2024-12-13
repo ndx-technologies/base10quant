@@ -24,7 +24,7 @@ jobs:
           go test -short -cover -coverprofile=coverage.out -covermode=atomic ./...
 
       - name: fuzz
-        run: go test -list . | grep Fuzz | xargs -P 8 -I {} go test -fuzz {} -fuzztime 5s ./base10quant
+        run: go test -list . | grep Fuzz | xargs -P 8 -I {} go test -fuzz {} -fuzztime 10s .
 
       - name: codecov.io coverage
         uses: codecov/codecov-action@v4.1.1
