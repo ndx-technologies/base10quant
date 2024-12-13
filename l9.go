@@ -4,9 +4,12 @@ import (
 	"errors"
 )
 
-var ErrInvalidFormat = errors.New("invalid format")
+var ErrL9InvalidFormat = errors.New("l9: invalid format")
 
-const MaxL9 = 999_999_999
+const (
+	MaxL9 = 999_999_999
+	MinL9 = 0
+)
 
 // L9 is base10 chars encoding least significant 9 decimals of uint32.
 type L9 struct{ v uint32 }
@@ -44,12 +47,12 @@ func (s L9) MarshalText() ([]byte, error) {
 
 func (s *L9) UnmarshalText(b []byte) error {
 	if len(b) != 9 {
-		return ErrInvalidFormat
+		return ErrL9InvalidFormat
 	}
 	s.v = 0
 	for i := 0; i < 9; i++ {
 		if b[i] < '0' || b[i] > '9' {
-			return ErrInvalidFormat
+			return ErrL9InvalidFormat
 		}
 		s.v *= 10
 		s.v += uint32(b[i] - '0')

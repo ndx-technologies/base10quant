@@ -1,10 +1,19 @@
 package base10quant_test
 
 import (
+	"fmt"
+	"math/rand"
 	"testing"
 
 	"github.com/ndx-technologies/base10quant"
 )
+
+func ExampleL9() {
+	var v base10quant.L9
+	v.UnmarshalText([]byte("123456789"))
+	fmt.Println(v)
+	// Output: 123456789
+}
 
 func TestL9(t *testing.T) {
 	t.Run("ok", func(t *testing.T) {
@@ -86,6 +95,45 @@ func FuzzL9(f *testing.F) {
 		}
 		if f != q {
 			t.Errorf("expected %v, got %v", q, f)
+		}
+	})
+}
+
+func BenchmarkL9(b *testing.B) {
+	b.Run("string", func(b *testing.B) {
+		x := rand.Uint32()
+		v := base10quant.L9FromUint32(x)
+		var s string
+
+		b.ResetTimer()
+		for i := 0; i < b.N; i++ {
+			s = v.String()
+		}
+
+		if len(s) == 0 {
+			b.Fatal("unexpected empty string")
+		}
+	})
+
+	b.Run("from_string", func(b *testing.B) {
+		x := rand.Uint32()
+		v := base10quant.L9FromUint32(x)
+		s := v.String()
+		var err error
+
+		b.ResetTimer()
+		for i := 0; i < b.N; i++ {
+			v, err = base10quant.L9FromString(s)
+		}
+
+		if len(s) == 0 {
+			b.Fatal("unexpected empty string")
+		}
+		if v == (base10quant.L9{}) {
+			b.Fatal("unexpected empty value")
+		}
+		if err != nil {
+			b.Fatal(err)
 		}
 	})
 }
