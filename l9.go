@@ -26,23 +26,26 @@ func (s L9) UInt32() uint32 { return s.v }
 
 func (s L9) IsEmpty() bool { return s.v == 0 }
 
-func (s L9) AppendBytes(b []byte) {
+func (s L9) AppendText(b []byte) ([]byte, error) {
+	n := len(b)
+	b = append(b, make([]byte, 9)...)
+
 	v := s.v
-	v, b[8] = v/10, '0'+byte(v%10)
-	v, b[7] = v/10, '0'+byte(v%10)
-	v, b[6] = v/10, '0'+byte(v%10)
-	v, b[5] = v/10, '0'+byte(v%10)
-	v, b[4] = v/10, '0'+byte(v%10)
-	v, b[3] = v/10, '0'+byte(v%10)
-	v, b[2] = v/10, '0'+byte(v%10)
-	v, b[1] = v/10, '0'+byte(v%10)
-	_, b[0] = v/10, '0'+byte(v%10)
+	v, b[n+8] = v/10, '0'+byte(v%10)
+	v, b[n+7] = v/10, '0'+byte(v%10)
+	v, b[n+6] = v/10, '0'+byte(v%10)
+	v, b[n+5] = v/10, '0'+byte(v%10)
+	v, b[n+4] = v/10, '0'+byte(v%10)
+	v, b[n+3] = v/10, '0'+byte(v%10)
+	v, b[n+2] = v/10, '0'+byte(v%10)
+	v, b[n+1] = v/10, '0'+byte(v%10)
+	_, b[n+0] = v/10, '0'+byte(v%10)
+	return b, nil
 }
 
 func (s L9) MarshalText() ([]byte, error) {
-	b := make([]byte, 9)
-	s.AppendBytes(b)
-	return b, nil
+	b := make([]byte, 0, 9)
+	return s.AppendText(b)
 }
 
 func (s *L9) UnmarshalText(b []byte) error {

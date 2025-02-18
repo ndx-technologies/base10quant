@@ -103,15 +103,9 @@ func BenchmarkL9(b *testing.B) {
 	b.Run("string", func(b *testing.B) {
 		x := rand.Uint32()
 		v := base10quant.L9FromUint32(x)
-		var s string
 
-		b.ResetTimer()
-		for i := 0; i < b.N; i++ {
-			s = v.String()
-		}
-
-		if len(s) == 0 {
-			b.Fatal("unexpected empty string")
+		for b.Loop() {
+			v.String()
 		}
 	})
 
@@ -119,21 +113,9 @@ func BenchmarkL9(b *testing.B) {
 		x := rand.Uint32()
 		v := base10quant.L9FromUint32(x)
 		s := v.String()
-		var err error
 
-		b.ResetTimer()
-		for i := 0; i < b.N; i++ {
-			v, err = base10quant.L9FromString(s)
-		}
-
-		if len(s) == 0 {
-			b.Fatal("unexpected empty string")
-		}
-		if v == (base10quant.L9{}) {
-			b.Fatal("unexpected empty value")
-		}
-		if err != nil {
-			b.Fatal(err)
+		for b.Loop() {
+			base10quant.L9FromString(s)
 		}
 	})
 }
