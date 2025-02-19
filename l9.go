@@ -24,7 +24,7 @@ func L9FromString(s string) (L9, error) {
 
 func (s L9) UInt32() uint32 { return s.v }
 
-func (s L9) IsEmpty() bool { return s.v == 0 }
+func (s L9) IsZero() bool { return s.v == 0 }
 
 func (s L9) AppendText(b []byte) ([]byte, error) {
 	n := len(b)

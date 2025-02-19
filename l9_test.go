@@ -1,6 +1,7 @@
 package base10quant_test
 
 import (
+	"bytes"
 	"fmt"
 	"math/rand"
 	"testing"
@@ -27,10 +28,10 @@ func TestL9(t *testing.T) {
 		for _, tc := range tests {
 			v := base10quant.L9FromUint32(tc.v)
 			if tc.s != v.String() {
-				t.Errorf("expected %s, got %s", tc.s, v.String())
+				t.Error(tc.s, v.String())
 			}
 			if tc.v != v.UInt32() {
-				t.Errorf("expected %d, got %d", tc.v, v.UInt32())
+				t.Error(tc.v, v.UInt32())
 			}
 
 			x, err := base10quant.L9FromString(tc.s)
@@ -38,7 +39,7 @@ func TestL9(t *testing.T) {
 				t.Error(err)
 			}
 			if v != x {
-				t.Errorf("expected %v, got %v", v, x)
+				t.Error(v, x)
 			}
 		}
 	})
@@ -54,7 +55,7 @@ func TestL9(t *testing.T) {
 		for _, tc := range tests {
 			_, err := base10quant.L9FromString(tc)
 			if err == nil {
-				t.Errorf("expected error")
+				t.Error("expected error")
 			}
 		}
 	})
@@ -70,7 +71,7 @@ func FuzzL9(f *testing.F) {
 
 		q := base10quant.L9FromUint32(v)
 		if v != q.UInt32() {
-			t.Errorf("expected %d, got %d", v, q.UInt32())
+			t.Error(v, q, q.UInt32())
 		}
 
 		g, err := base10quant.L9FromString(q.String())
@@ -78,40 +79,64 @@ func FuzzL9(f *testing.F) {
 			t.Error(err)
 		}
 		if q != g {
-			t.Errorf("expected %v, got %v", q, g)
+			t.Error(q, g)
 		}
 
 		b, err := q.MarshalText()
 		if err != nil {
-			t.Errorf("unexpected error: %v", err)
-		}
-
-		var f base10quant.L9
-		if !f.IsEmpty() {
-			t.Errorf("expected empty")
-		}
-		if err := (f).UnmarshalText(b); err != nil {
 			t.Error(err)
 		}
-		if f != q {
-			t.Errorf("expected %v, got %v", q, f)
+
+		var a base10quant.L9
+		if !a.IsZero() {
+			t.Error("expected empty")
+		}
+		if err := a.UnmarshalText(b); err != nil {
+			t.Error(err)
+		}
+		if a != q {
+			t.Error(a, q)
+		}
+	})
+}
+
+func FuzzL9_AppendBinary(f *testing.F) {
+	f.Fuzz(func(t *testing.T, out []byte, v uint32) {
+		v = v % 999_999_999
+		q := base10quant.L9FromUint32(v)
+
+		b, err := q.MarshalText()
+		if err != nil {
+			t.Error(err)
+		}
+
+		outBefore := make([]byte, len(out))
+		copy(outBefore, out)
+
+		out, err = q.AppendText(out)
+		if err != nil {
+			t.Error(err)
+		}
+
+		if !bytes.Equal(outBefore, out[:len(outBefore)]) {
+			t.Error(outBefore, out)
+		}
+		if !bytes.Equal(b, out[len(outBefore):]) {
+			t.Error(b, out[len(outBefore):])
 		}
 	})
 }
 
 func BenchmarkL9(b *testing.B) {
-	b.Run("string", func(b *testing.B) {
-		x := rand.Uint32()
-		v := base10quant.L9FromUint32(x)
+	v := base10quant.L9FromUint32(rand.Uint32())
 
+	b.Run("string", func(b *testing.B) {
 		for b.Loop() {
 			v.String()
 		}
 	})
 
 	b.Run("from_string", func(b *testing.B) {
-		x := rand.Uint32()
-		v := base10quant.L9FromUint32(x)
 		s := v.String()
 
 		for b.Loop() {
