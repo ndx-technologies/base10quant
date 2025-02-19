@@ -43,10 +43,7 @@ func (s L9) AppendText(b []byte) ([]byte, error) {
 	return b, nil
 }
 
-func (s L9) MarshalText() ([]byte, error) {
-	b := make([]byte, 0, 9)
-	return s.AppendText(b)
-}
+func (s L9) MarshalText() ([]byte, error) { return s.AppendText(make([]byte, 0, 9)) }
 
 func (s *L9) UnmarshalText(b []byte) error {
 	if len(b) != 9 {
