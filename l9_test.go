@@ -61,7 +61,7 @@ func TestL9(t *testing.T) {
 	})
 }
 
-func FuzzL9(f *testing.F) {
+func FuzzL9_EncodeDecode(f *testing.F) {
 	f.Add(uint32(999_999_999))
 	f.Add(uint32(1))
 	f.Add(uint32(0))
